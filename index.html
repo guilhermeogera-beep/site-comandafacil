@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ComandaFácil — o pedido chega no balcão na hora</title>
+<meta name="description" content="O cliente pede pelo QR code da mesa. O pedido chega no balcão na hora, com o tempo correndo. Um toque resolve." />
+<meta name="theme-color" content="#0E5C63" />
+
+<!-- Redes sociais: é o que aparece quando alguém manda o link no WhatsApp -->
+<meta property="og:title" content="ComandaFácil — o pedido chega no balcão na hora" />
+<meta property="og:description" content="Cliente pede pelo QR da mesa. Chega no balcão na hora, com o relógio correndo." />
+<meta property="og:type" content="website" />
+
+<style>
+/* ============================================================
+   COMANDAFÁCIL — SITE DE VENDAS
+   ============================================================
+   Uma página só, sem build e sem biblioteca — as mesmas regras
+   dos outros projetos: abre em qualquer lugar, funciona com a
+   internet ruim, e dá para mexer com um editor de texto.
+
+   QUEM LÊ ISTO É O DONO DO ESTABELECIMENTO, no celular, no meio
+   do expediente. Por isso: frase curta, número grande, e o botão
+   de WhatsApp sempre à mão.
+   ============================================================ */
+
+:root{
+  --tinta:#12201f;
+  --fraco:#5c6b6a;
+  --marca:#0E5C63;
+  --marca-escura:#083F45;
+  --marca-clara:#E6F2F1;
+  --destaque:#F4A024;
+  --linha:#dfe7e6;
+  --papel:#ffffff;
+  --fundo:#F6F9F8;
+  --sombra:0 10px 30px rgba(8,63,69,.10);
+  --raio:16px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--fundo);color:var(--tinta);
+  font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.faixa{max-width:1060px;margin:0 auto;padding:0 20px}
+h1,h2,h3{line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.4rem,3.4vw,2rem);font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0 0 1em}
+.fraco{color:var(--fraco)}
+
+/* ---------- topo ---------- */
+.topo{
+  background:linear-gradient(160deg,var(--marca-escura),var(--marca));
+  color:#fff;padding:26px 0 70px;
+}
+.marca{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+.marca-icone{
+  width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+}
+.chamada{margin-top:44px;max-width:660px}
+.chamada h1{color:#fff}
+.chamada p{font-size:clamp(1rem,2.4vw,1.2rem);color:#d6ece9;margin-bottom:1.6em}
+
+.botoes{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:15px 24px;border-radius:13px;font-weight:700;font-size:1.02rem;
+  text-decoration:none;border:2px solid transparent;min-height:52px;
+}
+.btn-zap{background:var(--destaque);color:#3a2600}
+.btn-zap:hover{filter:brightness(1.07)}
+.btn-linha{border-color:rgba(255,255,255,.5);color:#fff}
+.btn-linha:hover{background:rgba(255,255,255,.1)}
+
+/* ---------- blocos ---------- */
+section{padding:60px 0}
+.centro{text-align:center;max-width:640px;margin:0 auto 40px}
+
+.cartoes{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.cartao{
+  background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);
+  padding:24px;box-shadow:var(--sombra);
+}
+.cartao .emoji{font-size:1.8rem;display:block;margin-bottom:10px}
+
+/* ---------- o problema ---------- */
+.dor{background:var(--papel);border-top:1px solid var(--linha);border-bottom:1px solid var(--linha)}
+.dor-lista{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:26px}
+.dor-item{
+  padding:18px 20px;border-left:4px solid var(--destaque);
+  background:#FFF9EF;border-radius:0 12px 12px 0;
+}
+.dor-item b{display:block;margin-bottom:3px}
+
+/* ---------- passos ---------- */
+.passos{counter-reset:passo;display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.passo{position:relative;padding-top:8px}
+.passo::before{
+  counter-increment:passo;content:counter(passo);
+  display:flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--marca);color:#fff;font-weight:800;margin-bottom:12px;
+}
+
+/* ============================================================
+   AS TELAS
+   ------------------------------------------------------------
+   Não são fotos: é o CSS do próprio sistema, reproduzido aqui.
+   Sai mais leve que imagem, fica nítido em qualquer tela, e não
+   envelhece junto com um print antigo.
+   ============================================================ */
+.telas{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:34px}
+.tela{
+  background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);
+  box-shadow:var(--sombra);overflow:hidden;
+}
+.tela-topo{
+  background:var(--marca-escura);color:#fff;padding:12px 16px;
+  font-weight:700;font-size:.9rem;display:flex;justify-content:space-between;align-items:center;
+}
+.tela-selo{background:var(--destaque);color:#3a2600;border-radius:999px;padding:3px 11px;font-size:.76rem}
+.tela-corpo{padding:16px;background:var(--fundo)}
+.tela-nota{padding:0 20px 20px;font-size:.9rem;color:var(--fraco)}
+
+/* cartão de pedido, como a recepção vê */
+.p-cartao{
+  background:#fff;border:1px solid var(--linha);border-left:6px solid #E4572E;
+  border-radius:13px;padding:13px;margin-bottom:11px;
+}
+.p-cartao.calmo{border-left-color:#2E9E5B}
+.p-cartao.chamado{background:#FFF6E5;border-left:10px solid var(--destaque)}
+.p-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.p-quiosque{font-weight:800;font-size:1rem}
+.p-num{display:block;font-weight:400;font-size:.76rem;color:var(--fraco)}
+.p-tempo{
+  background:#FDECEA;color:#8d2b1a;border-radius:999px;
+  padding:4px 11px;font-weight:800;font-size:.82rem;white-space:nowrap;
+}
+.p-tempo.ok{background:#E7F5EC;color:#1c6b3d}
+.p-itens{margin:11px 0;font-size:.9rem}
+.p-item{display:flex;justify-content:space-between;padding:3px 0}
+.p-item b{color:var(--marca-escura)}
+.p-rodape{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+/* nowrap: sem isto "R$ 157,00" quebra em duas linhas no celular, e um
+   preço partido ao meio é a última coisa que se quer numa demonstração */
+.p-total{font-weight:800;color:var(--marca-escura);white-space:nowrap}
+.p-acoes{display:flex;gap:6px}
+.p-btn{background:#2E9E5B;color:#fff;border-radius:9px;padding:8px 13px;font-size:.83rem;font-weight:700}
+.p-sino{background:#FFF3DC;border:1.5px solid var(--destaque);border-radius:9px;padding:8px 10px;font-size:.9rem}
+
+/* cardápio, como o cliente vê */
+.c-abas{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.c-aba{background:#fff;border:1.5px solid var(--linha);border-radius:999px;padding:6px 13px;font-size:.83rem;font-weight:600;color:var(--fraco)}
+.c-aba.on{background:var(--marca);border-color:var(--marca);color:#fff}
+.c-grade{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.c-item{background:#fff;border:1px solid var(--linha);border-radius:12px;overflow:hidden}
+.c-foto{aspect-ratio:16/10;background:linear-gradient(135deg,var(--marca-clara),#fff);display:flex;align-items:center;justify-content:center;font-size:1.9rem}
+.c-corpo{padding:10px}
+.c-nome{font-weight:700;font-size:.9rem;display:block}
+.c-desc{font-size:.76rem;color:var(--fraco);display:block;margin:2px 0 7px;line-height:1.35}
+.c-preco{font-weight:800;color:var(--marca-escura);font-size:.95rem}
+
+/* ---------- lista de recursos ---------- */
+.recursos{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin-top:30px}
+.recurso{display:flex;gap:12px;align-items:flex-start;background:var(--papel);border:1px solid var(--linha);border-radius:13px;padding:16px}
+.recurso .ok{color:var(--marca);font-weight:800;flex:0 0 auto}
+.recurso b{display:block;margin-bottom:2px}
+.recurso span{font-size:.92rem;color:var(--fraco)}
+
+/* ---------- para quem ---------- */
+.publico{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px}
+.publico span{background:var(--marca-clara);color:var(--marca-escura);border-radius:999px;padding:9px 17px;font-weight:600;font-size:.94rem}
+
+/* ---------- fechamento ---------- */
+.fechar{background:var(--marca-escura);color:#fff;text-align:center}
+.fechar h2{color:#fff}
+.fechar p{color:#cfe6e4;max-width:520px;margin:0 auto 26px}
+.rodape{padding:26px 0 40px;text-align:center;font-size:.86rem;color:var(--fraco)}
+
+/* ---------- botão que segue a rolagem no celular ---------- */
+/* Menor do que a vontade de fazer grande: ele fica por cima do conteúdo
+   o tempo todo, e o que está por baixo — a demonstração das telas — é
+   justamente o que convence. */
+.zap-fixo{
+  position:fixed;right:14px;bottom:14px;z-index:50;
+  background:#25D366;color:#fff;border-radius:999px;
+  padding:11px 16px;font-weight:700;font-size:.92rem;text-decoration:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);display:flex;align-items:center;gap:7px;
+}
+@media (min-width:900px){ .zap-fixo{display:none} }
+@media (max-width:640px){
+  section{padding:44px 0}
+  .c-grade{grid-template-columns:1fr}
+  body{padding-bottom:80px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ⚠ ANTES DE PUBLICAR, TROQUE OS DOIS CONTATOS
+     Procure por  5519974206363  e  guilhermeogera@gmail.com  neste arquivo.
+     O número do WhatsApp vai no formato internacional, só dígitos:
+     55 + DDD + número.  Ex.: 5511987654321
+     ============================================================ -->
+
+<header class="topo">
+  <div class="faixa">
+    <div class="marca">
+      <span class="marca-icone">🧾</span>
+      ComandaFácil
+    </div>
+
+    <div class="chamada">
+      <h1>O pedido chega no balcão na hora — e ninguém precisa gritar.</h1>
+      <p>
+        O cliente aponta a câmera para o QR code da mesa e pede sozinho.
+        O pedido aparece no seu balcão na mesma hora, com o relógio correndo.
+        Um toque resolve.
+      </p>
+      <div class="botoes">
+        <a class="btn btn-zap" href="https://wa.me/5519974206363?text=Oi!%20Quero%20saber%20do%20ComandaF%C3%A1cil">
+          💬 Falar no WhatsApp
+        </a>
+        <a class="btn btn-linha" href="#como">Ver como funciona</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     O PROBLEMA
+     Vem antes da solução de propósito: o dono precisa se reconhecer
+     na cena antes de querer saber do produto.
+     ============================================================ -->
+<section class="dor">
+  <div class="faixa">
+    <h2>Você conhece essas cenas</h2>
+    <p class="fraco">Elas custam dinheiro todo fim de semana, e ninguém consegue medir quanto.</p>
+
+    <div class="dor-lista">
+      <div class="dor-item">
+        <b>O pedido que ninguém anotou</b>
+        O cliente pediu para quem estava passando. Aquilo não virou comanda, e ele lembra na hora de pagar.
+      </div>
+      <div class="dor-item">
+        <b>O atendente que atravessa o salão</b>
+        Três viagens para anotar, uma para confirmar o preço, outra para avisar que acabou.
+      </div>
+      <div class="dor-item">
+        <b>A comanda de papel</b>
+        Molha, rasga, some. E no fim do dia alguém soma tudo na calculadora.
+      </div>
+      <div class="dor-item">
+        <b>“Faz meia hora que pedi”</b>
+        Ninguém sabe se é meia hora ou dez minutos. Não existe relógio em papel.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="como">
+  <div class="faixa">
+    <div class="centro">
+      <h2>Como funciona</h2>
+      <p class="fraco">Sem aplicativo para o cliente baixar, sem cadastro, sem senha.</p>
+    </div>
+
+    <div class="passos">
+      <div class="passo">
+        <h3>QR code na mesa</h3>
+        <p class="fraco">Você imprime uma vez e cola. O código é fixo e nunca muda.</p>
+      </div>
+      <div class="passo">
+        <h3>O cliente pede</h3>
+        <p class="fraco">Aponta a câmera e cai direto no seu cardápio, com as suas cores e a sua logo.</p>
+      </div>
+      <div class="passo">
+        <h3>Chega no balcão</h3>
+        <p class="fraco">Na hora, com aviso sonoro e o tempo de espera correndo na tela.</p>
+      </div>
+      <div class="passo">
+        <h3>Um toque resolve</h3>
+        <p class="fraco">A conta de cada mesa vai somando sozinha até a hora de fechar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     AS TELAS
+     ============================================================ -->
+<section class="dor">
+  <div class="faixa">
+    <div class="centro">
+      <h2>As duas telas que importam</h2>
+      <p class="fraco">A do cliente e a do seu balcão.</p>
+    </div>
+
+    <div class="telas">
+
+      <div class="tela">
+        <div class="tela-topo">
+          <span>📋 No balcão</span>
+          <span class="tela-selo">2 a resolver</span>
+        </div>
+        <div class="tela-corpo">
+          <div class="p-cartao">
+            <div class="p-topo">
+              <div>
+                <span class="p-quiosque">Mesa 7</span>
+                <span class="p-num">Pedido #14 · 12:38</span>
+              </div>
+              <span class="p-tempo">6 min</span>
+            </div>
+            <div class="p-itens">
+              <div class="p-item"><span><b>2×</b> Porção de tilápia</span><span>R$ 130,00</span></div>
+              <div class="p-item"><span><b>3×</b> Cerveja lata</span><span>R$ 27,00</span></div>
+            </div>
+            <div class="p-rodape">
+              <span class="p-total">R$ 157,00</span>
+              <div class="p-acoes">
+                <span class="p-sino">🔔</span>
+                <span class="p-btn">✅ Lancei o pedido</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-cartao chamado">
+            <div class="p-topo">
+              <div>
+                <span class="p-quiosque">Mesa 3</span>
+                <span class="p-num">🔔 Chamado · 12:41</span>
+              </div>
+              <span class="p-tempo ok">agora</span>
+            </div>
+            <div class="p-itens">📝 Quero fechar a conta</div>
+            <div class="p-rodape">
+              <span class="p-total" style="font-size:.9rem">Quer falar com você</span>
+              <span class="p-btn">✅ Já fui atender</span>
+            </div>
+          </div>
+        </div>
+        <p class="tela-nota">
+          O tempo muda de cor sozinho: verde, âmbar, vermelho. Quem chega no meio
+          do turno entende o quadro sem ninguém explicar.
+        </p>
+      </div>
+
+      <div class="tela">
+        <div class="tela-topo">
+          <span>📱 No celular do cliente</span>
+          <span class="tela-selo">sem baixar nada</span>
+        </div>
+        <div class="tela-corpo">
+          <div class="c-abas">
+            <span class="c-aba on">🍽️ Cardápio</span>
+            <span class="c-aba">🥤 Bebidas</span>
+            <span class="c-aba">💡 Avisos</span>
+          </div>
+          <div class="c-grade">
+            <div class="c-item">
+              <div class="c-foto">🐟</div>
+              <div class="c-corpo">
+                <span class="c-nome">Tilápia frita</span>
+                <span class="c-desc">Serve 2 pessoas, acompanha limão</span>
+                <span class="c-preco">R$ 65,00</span>
+              </div>
+            </div>
+            <div class="c-item">
+              <div class="c-foto">🍟</div>
+              <div class="c-corpo">
+                <span class="c-nome">Batata frita</span>
+                <span class="c-desc">Porção grande</span>
+                <span class="c-preco">R$ 32,00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="tela-nota">
+          Com o seu nome, as suas cores e a sua logo. O cliente não vê marca de
+          sistema nenhuma — parece seu, porque é seu.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <div class="faixa">
+    <div class="centro">
+      <h2>O que vem junto</h2>
+      <p class="fraco">Tudo isso já está pronto, sem custo extra e sem módulo à parte.</p>
+    </div>
+
+    <div class="recursos">
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Conta por mesa</b><span>Vai somando sozinha. Na saída, imprime e fecha — a próxima começa do zero.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Cardápio que troca de horário</b><span>Um cardápio de dia e outro de noite, entrando sozinhos nos dias que você marcar.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Botão de chamar o atendente</b><span>Nem tudo é pedido. “Acabou o gelo” chega no balcão como um chamado.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Aviso que insiste</b><span>Toca até alguém ver, e volta de minuto em minuto enquanto o pedido espera.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Cardápio em planilha</b><span>Baixa em Excel, muda trinta preços de uma vez e sobe de volta.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Horário por produto</b><span>O prato executivo só aparece das 11h às 15h. Sozinho.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Relatório do dia</b><span>Quanto cada mesa consumiu, o que mais saiu, quanto tempo levou.</span></div></div>
+
+      <div class="recurso"><span class="ok">✓</span><div>
+        <b>Propaganda no tablet</b><span>Parado, o tablet vira painel de anúncios. Um toque volta ao pedido.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="dor">
+  <div class="faixa centro" style="max-width:760px">
+    <h2>Feito para quem atende em pontos espalhados</h2>
+    <p class="fraco">
+      Nasceu num pesqueiro com dezessete quiosques, onde o atendente andava
+      o dia inteiro. Serve para qualquer lugar em que o cliente está longe do balcão.
+    </p>
+    <div class="publico">
+      <span>🎣 Pesqueiros</span>
+      <span>🏖️ Quiosques de praia</span>
+      <span>🍺 Bares e restaurantes</span>
+      <span>🏨 Pousadas e hotéis</span>
+      <span>⚽ Clubes e quadras</span>
+      <span>🎪 Eventos</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="fechar">
+  <div class="faixa">
+    <h2>Quer ver funcionando?</h2>
+    <p>
+      Me chama no WhatsApp que eu te mostro o sistema rodando de verdade,
+      com o seu cardápio, em poucos minutos.
+    </p>
+    <div class="botoes" style="justify-content:center">
+      <a class="btn btn-zap" href="https://wa.me/5519974206363?text=Oi!%20Quero%20ver%20o%20ComandaF%C3%A1cil%20funcionando">
+        💬 Chamar no WhatsApp
+      </a>
+      <a class="btn btn-linha" href="mailto:guilhermeogera@gmail.com?subject=ComandaF%C3%A1cil">✉️ Mandar e-mail</a>
+    </div>
+  </div>
+</section>
+
+<footer class="rodape">
+  <div class="faixa">
+    ComandaFácil · <a href="https://appcomandafacil.com.br" style="color:var(--marca)">appcomandafacil.com.br</a>
+  </div>
+</footer>
+
+<a class="zap-fixo" href="https://wa.me/5519974206363?text=Oi!%20Quero%20saber%20do%20ComandaF%C3%A1cil">💬 WhatsApp</a>
+
+</body>
+</html>
