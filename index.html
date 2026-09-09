@@ -559,6 +559,19 @@ section{padding:60px 0}
   var DOMINIO = "appcomandafacil.com.br";
   var LEMBRETE = "comandafacil_ultima_unidade";
 
+  // Confere a unidade ANTES de mandar a pessoa embora. Qualquer
+  // subdomínio nosso responde, inclusive os digitados errado — e o
+  // destino a receberia com uma tela de entrar perfeitamente normal
+  // onde nenhuma senha funcionaria. Melhor errar aqui, onde ela ainda
+  // pode corrigir sem sair da página.
+  //
+  // A chave abaixo é a "publishable", a mesma que o app já entrega a
+  // qualquer visitante. Ela sozinha não abre nada: quem decide o que
+  // pode ser lido são as regras do banco, e esta consulta devolve só o
+  // nome e a logo — o que já apareceria abrindo o endereço da casa.
+  var BANCO = "https://jyrewatsfgficuzumuli.supabase.co";
+  var CHAVE = "sb_publishable_hvqRv057_VMXoFYcrqqBQA_Eyj1G08s";
+
   var bt     = document.getElementById("entrarBtn");
   var caixa  = document.getElementById("entrarCaixa");
   var forma  = document.getElementById("entrarForm");
@@ -587,6 +600,11 @@ section{padding:60px 0}
     if (abrindo) campo.focus();
   });
 
+  function levar(u) {
+    try { localStorage.setItem(LEMBRETE, u); } catch (err) { /* tudo bem */ }
+    window.location.href = "https://" + u + "." + DOMINIO + "/";
+  }
+
   forma.addEventListener("submit", function (e) {
     e.preventDefault();
     var u = soLetrasENumeros(campo.value);
@@ -602,10 +620,40 @@ section{padding:60px 0}
       return;
     }
 
-    try { localStorage.setItem(LEMBRETE, u); } catch (err) { /* tudo bem */ }
+    var ok = forma.querySelector(".entrar-ok");
+    aviso.textContent = "Procurando…";
+    if (ok) { ok.disabled = true; }
 
-    aviso.textContent = "Levando você para " + u + "." + DOMINIO + "…";
-    window.location.href = "https://" + u + "." + DOMINIO + "/";
+    fetch(BANCO + "/rest/v1/rpc/marca_da_unidade", {
+      method: "POST",
+      headers: {
+        "apikey": CHAVE,
+        "Authorization": "Bearer " + CHAVE,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ p_unidade: u })
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (linhas) {
+        var achou = linhas && linhas.length && linhas[0] && linhas[0].nome;
+        if (achou) {
+          aviso.textContent = "Levando você para " + linhas[0].nome + "…";
+          levar(u);
+          return;
+        }
+        if (ok) { ok.disabled = false; }
+        aviso.textContent =
+          'Não encontramos nenhum estabelecimento com o nome "' + u + '". ' +
+          "Confira com quem cuida do sistema aí.";
+        campo.focus();
+        campo.select();
+      })
+      .catch(function () {
+        // Sem internet ou banco fora do ar: não é motivo para prender a
+        // pessoa aqui. Vai assim mesmo — lá dentro ela consegue entrar,
+        // porque o app funciona com o que já está guardado no aparelho.
+        levar(u);
+      });
   });
 })();
 </script>
