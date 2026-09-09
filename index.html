@@ -58,7 +58,45 @@ p{margin:0 0 1em}
   background:linear-gradient(160deg,var(--marca-escura),var(--marca));
   color:#fff;padding:26px 0 70px;
 }
+.linha-topo{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .marca{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+
+/* ---- entrar no sistema (para quem já é cliente) --------------------
+   Discreto de propósito: esta página é para quem ainda não comprou.
+   Quem já usa entra pelo endereço da casa dele — esta porta serve para
+   o dia em que ele não lembrar qual era.                            */
+.entrar-btn{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.34);
+  color:#fff;font:inherit;font-size:.92rem;font-weight:600;
+  padding:9px 17px;border-radius:10px;cursor:pointer;min-height:40px;
+}
+.entrar-btn:hover{background:rgba(255,255,255,.24)}
+.entrar-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+.entrar-caixa{
+  margin-top:18px;background:var(--papel);color:var(--tinta);
+  border-radius:var(--raio);box-shadow:var(--sombra);
+  padding:20px;max-width:420px;
+}
+.entrar-caixa h2{margin:0 0 4px;font-size:1.05rem;color:var(--marca-escura)}
+.entrar-caixa > p{margin:0 0 14px;font-size:.9rem;color:var(--fraco)}
+.entrar-caixa label{
+  display:block;font-size:.82rem;font-weight:700;color:var(--fraco);margin-bottom:5px;
+}
+.entrar-campo{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+.entrar-caixa input{
+  flex:1 1 170px;min-width:0;font:inherit;padding:12px 14px;min-height:48px;
+  border:1px solid var(--linha);border-radius:11px;background:#fff;color:var(--tinta);
+}
+.entrar-caixa input:focus-visible{outline:2px solid var(--marca);outline-offset:1px}
+.entrar-ok{
+  flex:0 0 auto;background:var(--marca);color:#fff;border:0;font:inherit;font-weight:700;
+  padding:12px 22px;min-height:48px;border-radius:11px;cursor:pointer;
+}
+.entrar-ok:hover{background:var(--marca-escura)}
+.entrar-ok:focus-visible{outline:2px solid var(--marca);outline-offset:2px}
+.entrar-aviso{margin:11px 0 0;font-size:.85rem;color:var(--fraco)}
+
 .marca-icone{
   width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.16);
   display:flex;align-items:center;justify-content:center;font-size:1.2rem;
@@ -212,9 +250,40 @@ section{padding:60px 0}
 
 <header class="topo">
   <div class="faixa">
-    <div class="marca">
-      <span class="marca-icone">🧾</span>
-      ComandaFácil
+    <div class="linha-topo">
+      <div class="marca">
+        <span class="marca-icone">🧾</span>
+        ComandaFácil
+      </div>
+      <button type="button" class="entrar-btn" id="entrarBtn"
+              aria-expanded="false" aria-controls="entrarCaixa">Entrar no sistema</button>
+    </div>
+
+    <!-- ============================================================
+         ENTRAR: SÓ PERGUNTA A UNIDADE, NUNCA A SENHA
+         A senha é digitada no endereço da própria casa, e não aqui.
+         Não é escrúpulo: a sessão fica guardada por endereço, então
+         uma senha digitada nesta página não valeria nada lá dentro —
+         a pessoa digitaria certo e continuaria de fora, sem entender.
+         Além disso, senha só se digita onde a casa já apareceu na
+         tela: é assim que ela aprende a desconfiar de páginas que
+         pedem a senha em qualquer lugar.
+         ============================================================ -->
+    <div class="entrar-caixa" id="entrarCaixa" hidden>
+      <h2>Já é cliente?</h2>
+      <p>Diga o nome curto do seu estabelecimento e a gente te leva até a sua entrada.</p>
+      <form id="entrarForm">
+        <label for="entrarUnidade">Unidade</label>
+        <div class="entrar-campo">
+          <input type="text" id="entrarUnidade" name="unidade"
+                 placeholder="ex.: quintadoaveiro" autocomplete="off"
+                 autocapitalize="none" spellcheck="false" />
+          <button type="submit" class="entrar-ok">Ir</button>
+        </div>
+        <p class="entrar-aviso" id="entrarAviso" role="status">
+          A senha você digita na tela seguinte, já com a marca da sua casa.
+        </p>
+      </form>
     </div>
 
     <div class="chamada">
@@ -473,6 +542,73 @@ section{padding:60px 0}
 </footer>
 
 <a class="zap-fixo" href="https://wa.me/5519974206363?text=Oi!%20Quero%20saber%20do%20ComandaF%C3%A1cil">💬 WhatsApp</a>
+
+<script>
+/* ====================================================================
+   ENTRAR NO SISTEMA
+   --------------------------------------------------------------------
+   Esta página não sabe fazer login, e não deve saber. O que ela faz é
+   levar a pessoa até a porta certa: o endereço da casa dela, onde o
+   app pergunta usuário e senha já mostrando a logo do estabelecimento.
+
+   ⚠ TROQUE AQUI se o domínio mudar.
+   ==================================================================== */
+(function () {
+  "use strict";
+
+  var DOMINIO = "appcomandafacil.com.br";
+  var LEMBRETE = "comandafacil_ultima_unidade";
+
+  var bt     = document.getElementById("entrarBtn");
+  var caixa  = document.getElementById("entrarCaixa");
+  var forma  = document.getElementById("entrarForm");
+  var campo  = document.getElementById("entrarUnidade");
+  var aviso  = document.getElementById("entrarAviso");
+  if (!bt || !caixa || !forma || !campo) return;
+
+  // Tira acento, espaço e maiúscula: quem digita "Quinta do Aveiro"
+  // quer dizer "quintadoaveiro", e no balcão às sete da manhã ninguém
+  // vai adivinhar isso sozinho.
+  function soLetrasENumeros(txt) {
+    return String(txt || "").trim().toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]/g, "");
+  }
+
+  try {
+    var ultima = localStorage.getItem(LEMBRETE);
+    if (ultima) campo.value = ultima;
+  } catch (e) { /* sem armazenamento: só não vem preenchido */ }
+
+  bt.addEventListener("click", function () {
+    var abrindo = caixa.hidden;
+    caixa.hidden = !abrindo;
+    bt.setAttribute("aria-expanded", abrindo ? "true" : "false");
+    if (abrindo) campo.focus();
+  });
+
+  forma.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var u = soLetrasENumeros(campo.value);
+
+    if (!u) {
+      aviso.textContent = "Escreva o nome curto do seu estabelecimento.";
+      campo.focus();
+      return;
+    }
+    if (u.length < 2) {
+      aviso.textContent = "Esse nome parece curto demais. Confira com quem cuida do sistema aí.";
+      campo.focus();
+      return;
+    }
+
+    try { localStorage.setItem(LEMBRETE, u); } catch (err) { /* tudo bem */ }
+
+    aviso.textContent = "Levando você para " + u + "." + DOMINIO + "…";
+    window.location.href = "https://" + u + "." + DOMINIO + "/";
+  });
+})();
+</script>
 
 </body>
 </html>
