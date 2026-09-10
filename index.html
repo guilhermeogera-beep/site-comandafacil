@@ -12,6 +12,13 @@
 <meta property="og:description" content="Cliente pede pelo QR da mesa. Chega no balcão na hora, com o relógio correndo." />
 <meta property="og:type" content="website" />
 
+<!-- Uma fonte só, e só para os títulos: o corpo do texto usa a do próprio
+     aparelho, que já está carregada. Quem lê isto costuma estar no 4G do
+     salão, e cada arquivo a mais é meio segundo de tela branca. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" />
+
 <style>
 /* ============================================================
    COMANDAFÁCIL — SITE DE VENDAS
@@ -26,32 +33,48 @@
    ============================================================ */
 
 :root{
-  --tinta:#12201f;
-  --fraco:#5c6b6a;
+  --tinta:#0F1E1D;
+  --fraco:#576A69;
   --marca:#0E5C63;
-  --marca-escura:#083F45;
-  --marca-clara:#E6F2F1;
+  --marca-escura:#06373C;
+  --marca-clara:#E4F1F0;
   --destaque:#F4A024;
-  --linha:#dfe7e6;
+  --linha:#DCE7E5;
   --papel:#ffffff;
-  --fundo:#F6F9F8;
-  --sombra:0 10px 30px rgba(8,63,69,.10);
+  --fundo:#F4F8F7;
+  /* Sombra em duas camadas: um fio de contorno para o cartão ter borda
+     mesmo em tela clara, e um halo largo e fraco para ele descolar do
+     fundo sem parecer que está flutuando. */
+  --sombra:0 1px 2px rgba(6,55,60,.05), 0 14px 32px -18px rgba(6,55,60,.34);
   --raio:16px;
+  --display:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+
 body{
   margin:0;background:var(--fundo);color:var(--tinta);
-  font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font:17px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;
+  /* nenhum bloco desta página deve sair pela lateral; se sair, é defeito
+     — mas no celular alheio isso vira barra de rolagem horizontal, e é
+     o tipo de coisa que faz a página parecer amadora */
+  overflow-x:hidden;
 }
-.faixa{max-width:1060px;margin:0 auto;padding:0 20px}
-h1,h2,h3{line-height:1.2;margin:0 0 .5em}
-h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:800;letter-spacing:-.02em}
-h2{font-size:clamp(1.4rem,3.4vw,2rem);font-weight:800;letter-spacing:-.01em}
-h3{font-size:1.05rem;font-weight:700}
-p{margin:0 0 1em}
+.faixa{max-width:1080px;margin:0 auto;padding:0 22px}
+
+/* Os títulos têm cara própria; o corpo fica na fonte do aparelho, que
+   lê melhor em tela pequena e não custa download. */
+h1,h2,h3{font-family:var(--display);line-height:1.08;margin:0 0 .5em;letter-spacing:-.025em;text-wrap:balance}
+h1{font-size:clamp(2rem,6.2vw,3.4rem);font-weight:800}
+h2{font-size:clamp(1.55rem,4.4vw,2.15rem);font-weight:800}
+h3{font-size:1.08rem;font-weight:600;letter-spacing:-.012em;line-height:1.25}
+p{margin:0 0 1em;text-wrap:pretty}
 .fraco{color:var(--fraco)}
+
+/* Preço e relógio alinhados em coluna, como numa comanda de verdade. */
+.p-tempo,.p-total,.c-preco{font-variant-numeric:tabular-nums}
 
 /* ---------- topo ---------- */
 .topo{
@@ -226,16 +249,50 @@ section{padding:60px 0}
    o tempo todo, e o que está por baixo — a demonstração das telas — é
    justamente o que convence. */
 .zap-fixo{
-  position:fixed;right:14px;bottom:14px;z-index:50;
+  position:fixed;right:14px;z-index:50;
+  /* respeita a barra de gestos do iPhone: sem isto o botão fica meio
+     escondido atrás dela justo nos aparelhos mais comuns */
+  bottom:calc(14px + env(safe-area-inset-bottom,0px));
   background:#25D366;color:#fff;border-radius:999px;
-  padding:11px 16px;font-weight:700;font-size:.92rem;text-decoration:none;
+  padding:13px 18px;font-weight:700;font-size:.95rem;text-decoration:none;
   box-shadow:0 6px 18px rgba(0,0,0,.22);display:flex;align-items:center;gap:7px;
+  min-height:48px;
+}
+.zap-fixo:focus-visible,.btn:focus-visible,a:focus-visible{
+  outline:3px solid var(--destaque);outline-offset:3px;border-radius:8px;
 }
 @media (min-width:900px){ .zap-fixo{display:none} }
+
+/* ---------- celular ----------
+   Quem lê esta página costuma estar de pé, no meio do expediente, com
+   uma mão só. Botão que ocupa a largura toda, seção mais curta e nada
+   de duas colunas espremidas. */
 @media (max-width:640px){
-  section{padding:44px 0}
+  body{padding-bottom:84px}
+  section{padding:40px 0}
+  .faixa{padding:0 18px}
+  .topo{padding:20px 0 46px}
+  .chamada{margin-top:32px}
+  .chamada p{margin-bottom:1.4em}
+
+  .botoes{flex-direction:column;align-items:stretch}
+  .btn{justify-content:center;width:100%}
+
   .c-grade{grid-template-columns:1fr}
-  body{padding-bottom:80px}
+  .telas{gap:18px;margin-top:24px}
+  .dor-lista,.recursos,.cartoes{gap:12px}
+  .passos{gap:18px}
+  .centro{margin-bottom:26px}
+
+  .linha-topo{gap:10px}
+  .marca{font-size:1.05rem}
+  .entrar-btn{padding:9px 13px;font-size:.85rem}
+  .entrar-caixa{padding:17px}
+  .publico span{font-size:.9rem;padding:8px 14px}
+
+  /* o preço e o botão do cartão de pedido deixam de brigar por espaço */
+  .p-rodape{gap:8px}
+  .p-btn,.p-sino{padding:9px 12px}
 }
 </style>
 </head>
